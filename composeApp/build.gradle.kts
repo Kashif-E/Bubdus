@@ -4,6 +4,7 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -11,9 +12,20 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
+
+    ksp {
+        arg("KOIN_CONFIG_CHECK", "true")
+    }
+
+    sourceSets.named("commonMain").configure {
+        kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+    }
+
+    task("testClasses")
     androidTarget {
         compilations.all {
             compileTaskProvider {
@@ -24,8 +36,7 @@ kotlin {
             }
         }
         //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        instrumentedTestVariant {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class) instrumentedTestVariant {
             sourceSetTree.set(KotlinSourceSetTree.test)
             dependencies {
                 debugImplementation(libs.androidx.testManifest)
@@ -33,6 +44,7 @@ kotlin {
             }
         }
     }
+
 
     jvm()
 //
@@ -42,9 +54,7 @@ kotlin {
 //    }
 
     listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
+        iosX64(), iosArm64(), iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
             baseName = "ComposeApp"
@@ -68,12 +78,18 @@ kotlin {
             implementation(libs.composeIcons.cssGg)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            api(libs.koin.annotations)
+            implementation(libs.koin.compose.mp)
+            implementation(libs.lifecycle.viewmodel)
+            implementation(libs.lifecycle.runtime)
         }
+
 
         commonTest.dependencies {
             implementation(kotlin("test"))
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
+            @OptIn(ExperimentalComposeLibrary::class) implementation(compose.uiTest)
             implementation(libs.kotlinx.coroutines.test)
         }
 
@@ -88,8 +104,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
         }
 
-        iosMain.dependencies {
-        }
+        iosMain.dependencies {}
 
     }
 }
@@ -113,8 +128,7 @@ android {
         res.srcDirs("src/androidMain/res")
     }
     //https://developer.android.com/studio/test/gradle-managed-devices
-    @Suppress("UnstableApiUsage")
-    testOptions {
+    @Suppress("UnstableApiUsage") testOptions {
         managedDevices.devices {
             maybeCreate<ManagedVirtualDevice>("pixel5").apply {
                 device = "Pixel 5"
@@ -132,7 +146,6 @@ android {
         compose = true
     }
 }
-
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -142,5 +155,21 @@ compose.desktop {
             packageName = "com.kashif.expense.desktopApp"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+// KSP Tasks
+dependencies {
+    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
+   // add("kspAndroid", libs.koin.ksp.compiler)
+    add("kspIosX64", libs.koin.ksp.compiler)
+    add("kspIosArm64", libs.koin.ksp.compiler)
+    add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
+}
+
+// KSP Metadata Trigger
+project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
     }
 }
