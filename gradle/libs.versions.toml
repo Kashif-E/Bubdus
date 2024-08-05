@@ -1,7 +1,7 @@
 [versions]
 
 kotlin = "2.0.0"
-compose = "1.6.10"
+compose = "1.7.0-alpha02"
 agp = "8.2.2"
 androidx-activityCompose = "1.9.1"
 androidx-uiTest = "1.6.8"
@@ -16,9 +16,10 @@ ksp-version = "2.0.0-1.0.23"
 koin-bom = "3.6.0-wasm-alpha2"
 koin-ksp-version = "1.4.0-RC3"
 lifecycle-version = "2.8.0"
-
+firebase-live = "1.13.0"
 [libraries]
-
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-live" }
+firebase-cloudStorage = { module = "dev.gitlive:firebase-storage", version.ref = "firebase-live" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
@@ -38,7 +39,7 @@ lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-vie
 lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-version" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
-koin-compose-mp = { module = "io.insert-koin:koin-compose" ,version.ref = "koin-bom"}
+koin-compose-mp = { module = "io.insert-koin:koin-compose", version.ref = "koin-bom" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-ksp-version" }
 koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-ksp-version" }
 

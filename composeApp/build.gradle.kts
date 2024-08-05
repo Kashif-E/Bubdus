@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
 kotlin {
@@ -84,6 +85,7 @@ kotlin {
             implementation(libs.koin.compose.mp)
             implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.runtime)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
         }
 
 
@@ -97,6 +99,9 @@ kotlin {
             implementation(compose.uiTooling)
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+            implementation("com.google.firebase:firebase-firestore")
+            implementation("com.google.firebase:firebase-storage")
         }
 
         jvmMain.dependencies {
